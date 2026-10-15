@@ -3,393 +3,936 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PyQuest - The Interactive Python Odyssey | Beginners to Pro</title>
-  <meta name="description" content="A creative, interactive Python learning platform with visual mental models, in-browser code runner, gamified quizzes, and dual themes (Midnight Blue & Sky Blue).">
-
-  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <title>PyQuest - Complete Python Interactive Hub</title>
+  <!-- Google Fonts & Font Awesome 6 Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Font Awesome 6 Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <!-- App Stylesheet -->
-  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* ==========================================================================
+       DUAL THEMES: MIDNIGHT BLUE (DARK) & SKY BLUE (LIGHT)
+       ========================================================================== */
+    :root, [data-theme="dark"] {
+      /* MIDNIGHT BLUE PALETTE */
+      --bg-base: #020817;
+      --bg-surface: #071329;
+      --bg-card: rgba(11, 27, 58, 0.85);
+      --bg-card-hover: rgba(15, 36, 78, 0.95);
+      --bg-input: #040d21;
+      --bg-code: #010612;
+      --border-subtle: rgba(56, 189, 248, 0.18);
+      --border-active: #38bdf8;
+      --border-card: rgba(56, 189, 248, 0.25);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-faint: #64748b;
+      --accent-cyan: #38bdf8;
+      --accent-sky: #60a5fa;
+      --accent-gold: #fbbf24;
+      --accent-emerald: #34d399;
+      --accent-rose: #f43f5e;
+      --shadow-glow: 0 0 25px rgba(56, 189, 248, 0.35);
+      --tag-bg: rgba(56, 189, 248, 0.12);
+      --tag-border: rgba(56, 189, 248, 0.3);
+      --tag-text: #38bdf8;
+      --grad-hero: linear-gradient(135deg, #020817 0%, #0c1c3d 50%, #031433 100%);
+      --grad-primary: linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%);
+    }
 
-  <!-- Pyodide WebAssembly Python Engine (Deferred CDN) -->
-  <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js" defer></script>
+    [data-theme="light"] {
+      /* SKY BLUE PALETTE */
+      --bg-base: #f0f9ff;
+      --bg-surface: #e0f2fe;
+      --bg-card: rgba(255, 255, 255, 0.94);
+      --bg-card-hover: #ffffff;
+      --bg-input: #f8fafc;
+      --bg-code: #0b192c;
+      --border-subtle: #bae6fd;
+      --border-active: #0284c7;
+      --border-card: #7dd3fc;
+      --text-main: #0c1e3d;
+      --text-muted: #475569;
+      --text-faint: #64748b;
+      --accent-cyan: #0284c7;
+      --accent-sky: #0369a1;
+      --accent-gold: #d97706;
+      --accent-emerald: #059669;
+      --accent-rose: #e11d48;
+      --shadow-glow: 0 0 20px rgba(2, 132, 199, 0.25);
+      --tag-bg: #e0f2fe;
+      --tag-border: #7dd3fc;
+      --tag-text: #0369a1;
+      --grad-hero: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #f0f9ff 100%);
+      --grad-primary: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
+    body { background-color: var(--bg-base); color: var(--text-main); min-height: 100vh; line-height: 1.6; }
+    code, pre { font-family: 'JetBrains Mono', monospace; }
+
+    /* Header */
+    .site-header { position: sticky; top: 0; z-index: 1000; background: var(--bg-surface); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-subtle); padding: 0.85rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand-wrapper { display: flex; align-items: center; gap: 0.8rem; }
+    .brand-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--grad-primary); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.4rem; box-shadow: var(--shadow-glow); }
+    .brand-text h1 { font-size: 1.3rem; font-weight: 800; background: var(--grad-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .brand-tagline { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+
+    .search-container { flex: 1; max-width: 420px; position: relative; }
+    .search-container input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.4rem; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 50px; color: var(--text-main); font-size: 0.88rem; outline: none; }
+    .search-container i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+    .header-actions { display: flex; align-items: center; gap: 0.8rem; }
+    .gamify-hud { display: flex; align-items: center; gap: 0.8rem; background: var(--tag-bg); border: 1px solid var(--tag-border); padding: 0.35rem 0.85rem; border-radius: 50px; font-weight: 700; font-size: 0.82rem; }
+    .gamify-hud i { color: var(--accent-gold); }
+    .theme-switch-btn { background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-main); padding: 0.5rem 1rem; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; font-weight: 700; }
+    .theme-switch-btn i { color: var(--accent-cyan); font-size: 1rem; }
+
+    /* Hero Banner */
+    .hero-banner { background: var(--grad-hero); border-bottom: 1px solid var(--border-subtle); padding: 2rem; }
+    .hero-content { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+    .hero-text h2 { font-size: 2.1rem; font-weight: 800; line-height: 1.2; margin-bottom: 0.5rem; }
+    .hero-text h2 span { background: var(--grad-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-text p { color: var(--text-muted); max-width: 600px; font-size: 0.98rem; }
+    .progress-box { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 14px; padding: 1.2rem; width: 300px; }
+    .progress-track { width: 100%; height: 8px; background: var(--bg-base); border-radius: 8px; overflow: hidden; margin: 0.6rem 0; }
+    .progress-fill { height: 100%; background: var(--grad-primary); border-radius: 8px; transition: width 0.4s ease; }
+
+    /* Main Grid */
+    .main-wrapper { max-width: 1440px; margin: 1.5rem auto; padding: 0 1.5rem; display: grid; grid-template-columns: 330px 1fr; gap: 1.5rem; }
+    .cat-bar { grid-column: 1 / -1; display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.3rem; }
+    .cat-btn { background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-muted); padding: 0.4rem 0.9rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cat-btn.active, .cat-btn:hover { background: var(--accent-cyan); border-color: var(--accent-cyan); color: #fff; }
+
+    /* Sidebar */
+    .topic-sidebar { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 16px; position: sticky; top: 80px; max-height: calc(100vh - 100px); display: flex; flex-direction: column; overflow: hidden; }
+    .sidebar-head { padding: 1rem; border-bottom: 1px solid var(--border-subtle); font-weight: 700; font-size: 0.95rem; display: flex; justify-content: space-between; }
+    .topic-scroll { list-style: none; overflow-y: auto; padding: 0.6rem; display: flex; flex-direction: column; gap: 0.35rem; }
+    .topic-item { display: flex; align-items: center; gap: 0.7rem; padding: 0.65rem 0.85rem; border-radius: 10px; cursor: pointer; font-size: 0.85rem; font-weight: 600; border: 1px solid transparent; }
+    .topic-item:hover { background: var(--bg-card-hover); }
+    .topic-item.active { background: var(--tag-bg); border-color: var(--border-active); color: var(--accent-cyan); }
+    .topic-item.completed i.check { color: var(--accent-emerald); }
+
+    /* Right Main Stage */
+    .stage-wrapper { display: flex; flex-direction: column; gap: 1.5rem; }
+    .card-box { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 16px; padding: 1.8rem; }
+    .stage-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+    .cat-badge { display: inline-block; background: var(--tag-bg); color: var(--tag-text); border: 1px solid var(--tag-border); padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.4rem; }
+    
+    .btn-action { background: var(--grad-primary); border: none; color: #fff; padding: 0.6rem 1.2rem; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
+    .btn-action.sec { background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-main); }
+    .btn-action:hover { opacity: 0.92; transform: translateY(-1px); }
+
+    /* Perspective Tabs */
+    .persp-bar { display: flex; background: var(--bg-base); padding: 0.3rem; border-radius: 10px; gap: 0.4rem; max-width: 440px; margin: 1rem 0; }
+    .persp-btn { flex: 1; background: transparent; border: none; color: var(--text-muted); padding: 0.45rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+    .persp-btn.active { background: var(--bg-card); color: var(--accent-cyan); }
+    .persp-content { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1rem 1.2rem; font-size: 0.95rem; margin-bottom: 1.2rem; }
+
+    /* Code Display */
+    .code-container { background: var(--bg-code); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; margin: 1rem 0; }
+    .code-bar { background: rgba(255,255,255,0.05); padding: 0.4rem 1rem; font-size: 0.75rem; color: var(--text-muted); display: flex; justify-content: space-between; }
+    .code-container pre { padding: 1rem; overflow-x: auto; font-size: 0.9rem; color: #e2e8f0; line-height: 1.5; }
+
+    /* Key Takeaways */
+    .takeaways-wrap { background: var(--tag-bg); border: 1px solid var(--tag-border); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1.2rem; }
+    .takeaways-wrap h4 { color: var(--tag-text); font-size: 0.9rem; margin-bottom: 0.5rem; }
+    .takeaways-wrap ul { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.88rem; }
+    .takeaways-wrap li i { color: var(--accent-cyan); margin-right: 0.4rem; }
+
+    /* Visualizer Arena */
+    .toy-nav { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .toy-tab-btn { background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-muted); padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; }
+    .toy-tab-btn.active { background: var(--accent-cyan); color: #fff; border-color: var(--accent-cyan); }
+
+    /* String Slicer Toy */
+    .slicer-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.2rem; }
+    .slicer-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin: 1rem 0; }
+    .slicer-tile-row { display: flex; gap: 0.4rem; justify-content: center; flex-wrap: wrap; margin: 1.2rem 0; }
+    .s-tile-node { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+    .s-tile { width: 40px; height: 44px; background: var(--bg-card); border: 2px solid var(--border-subtle); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; }
+    .s-tile-node.active .s-tile { background: var(--accent-cyan); color: #fff; border-color: #fff; transform: translateY(-4px); box-shadow: 0 0 15px var(--accent-cyan); }
+    .s-pos, .s-neg { font-size: 0.7rem; color: var(--text-faint); font-family: monospace; }
+    .s-tile-node.active .s-pos, .s-tile-node.active .s-neg { color: var(--accent-cyan); font-weight: 700; }
+    .s-res { background: var(--bg-card); padding: 0.8rem 1.2rem; border-radius: 8px; font-family: monospace; font-size: 1.1rem; color: var(--accent-cyan); font-weight: 700; text-align: center; border: 1px solid var(--border-subtle); }
+
+    /* Playground */
+    .play-grid { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; min-height: 300px; }
+    .editor-pane { background: var(--bg-code); display: flex; flex-direction: column; border-right: 1px solid var(--border-subtle); }
+    .output-pane { background: var(--bg-base); display: flex; flex-direction: column; }
+    .pane-head { background: rgba(255,255,255,0.04); padding: 0.4rem 0.8rem; font-size: 0.75rem; color: var(--text-muted); }
+    #code-input { flex: 1; background: transparent; border: none; color: #fff; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; resize: none; outline: none; }
+    #code-output { flex: 1; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent-cyan); overflow-y: auto; white-space: pre-wrap; }
+
+    /* Quiz Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(2,8,23,0.88); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 1rem; }
+    .modal-overlay.open { display: flex; }
+    .modal-card { background: var(--bg-card); border: 1px solid var(--border-active); border-radius: 16px; width: 100%; max-width: 600px; padding: 1.5rem; box-shadow: var(--shadow-glow); }
+    .q-opt-btn { width: 100%; background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-main); padding: 0.75rem 1rem; border-radius: 10px; margin-bottom: 0.5rem; cursor: pointer; text-align: left; font-size: 0.9rem; font-weight: 600; }
+    .q-opt-btn:hover { border-color: var(--accent-cyan); background: var(--bg-card-hover); }
+    .q-opt-btn.correct { background: rgba(52, 211, 153, 0.15); border-color: var(--accent-emerald); color: #a7f3d0; }
+    .q-opt-btn.wrong { background: rgba(244, 63, 94, 0.15); border-color: var(--accent-rose); color: #fecdd3; }
+    .q-expl { background: var(--bg-surface); border-radius: 8px; padding: 0.8rem; font-size: 0.85rem; margin: 0.8rem 0; display: none; }
+
+    @media (max-width: 900px) {
+      .main-wrapper { grid-template-columns: 1fr; }
+      .topic-sidebar { position: relative; top: 0; max-height: 320px; }
+      .play-grid { grid-template-columns: 1fr; }
+      .editor-pane { border-right: none; border-bottom: 1px solid var(--border-subtle); min-height: 220px; }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- ========================================================================
-       TOP HEADER & GAMIFICATION HUD
-       ======================================================================== -->
+  <!-- Top Header Navigation -->
   <header class="site-header">
     <div class="brand-wrapper">
-      <div class="brand-icon">
-        <i class="fa-brands fa-python"></i>
-      </div>
+      <div class="brand-icon"><i class="fa-brands fa-python"></i></div>
       <div class="brand-text">
         <h1>PyQuest</h1>
         <div class="brand-tagline">Visual Python Odyssey</div>
       </div>
     </div>
 
-    <!-- Live Search -->
+    <!-- Search Input -->
     <div class="search-container">
-      <div class="search-input-wrapper">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="global-search-input" placeholder="Search Python topics, syntax, or concepts (e.g. slicing, loops, OOP)...">
-      </div>
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="search-input" placeholder="Search Python topics (e.g., slicing, loops, OOP)...">
     </div>
 
-    <!-- Actions: Gamification HUD & Theme Toggle -->
+    <!-- Right HUD & Theme Switch -->
     <div class="header-actions">
       <div class="gamify-hud">
-        <div class="hud-item" title="Experience Points">
-          <i class="fa-solid fa-bolt"></i>
-          <span id="user-xp-counter">0 XP</span>
-        </div>
-        <div class="hud-item" title="Correct Quiz Streak">
-          <span id="user-streak-counter">0 🔥</span>
-        </div>
-        <div class="rank-pill" id="user-rank-badge">Syntax Novice 🐣</div>
+        <span><i class="fa-solid fa-bolt"></i> <span id="xp-val">0 XP</span></span>
+        <span id="streak-val">0 🔥</span>
+        <span id="rank-val" style="color: var(--accent-cyan);">Novice 🐣</span>
       </div>
-
-      <!-- Theme Switcher: Midnight Blue (Dark) <-> Sky Blue (Light) -->
-      <button class="theme-switch-btn" id="theme-toggle-btn" title="Toggle between Midnight Blue and Sky Blue themes">
-        <i class="fa-solid fa-moon" id="theme-icon"></i>
-        <span id="theme-label">Midnight Blue</span>
+      <button class="theme-switch-btn" id="theme-btn">
+        <i class="fa-solid fa-moon" id="theme-ico"></i>
+        <span id="theme-txt">Midnight Blue</span>
       </button>
     </div>
   </header>
 
-  <!-- ========================================================================
-       HERO BANNER & PROGRESS OVERVIEW
-       ======================================================================== -->
+  <!-- Hero Progress Banner -->
   <section class="hero-banner">
     <div class="hero-content">
       <div class="hero-text">
-        <div class="hero-badge-pill">
-          <i class="fa-solid fa-wand-magic-sparkles"></i>
-          <span>Interactive Visual Learning &bull; Zero Fluff</span>
-        </div>
         <h2>Learn Python Like <span>No One Ever Taught You</span></h2>
-        <p>
-          Master all core Python concepts through hands-on visual simulations, live WebAssembly code execution,
-          instant "Explain Like I'm 10" analogies, and reward-packed quizzes.
-        </p>
-
-        <div class="hero-stats-row">
-          <div class="stat-item">
-            <span class="stat-num">16</span>
-            <span class="stat-label">Complete Modules</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-num">6</span>
-            <span class="stat-label">Visual Interactive Toys</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-num">50+</span>
-            <span class="stat-label">Quiz Challenges</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-num">100%</span>
-            <span class="stat-label">In-Browser Python</span>
-          </div>
-        </div>
+        <p>Zero fluff. Visual mental models, step-by-step memory simulation, live in-browser execution, and gamified quizzes.</p>
       </div>
-
-      <div class="hero-progress-card">
-        <div class="progress-header">
-          <span><i class="fa-solid fa-graduation-cap"></i> Overall Course Journey</span>
-          <span id="overall-progress-label">0 / 16 (0%)</span>
+      <div class="progress-box">
+        <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:700;">
+          <span>Curriculum Mastery</span>
+          <span id="progress-pct">0 / 16 (0%)</span>
         </div>
-        <div class="progress-bar-track">
-          <div class="progress-bar-fill" id="overall-progress-bar" style="width: 0%;"></div>
-        </div>
-        <div class="quick-links">
-          <button class="btn-pill-sm" id="open-cheatsheet-btn">
-            <i class="fa-solid fa-book-bookmark"></i> Syntax Cheat Sheet
-          </button>
-          <a href="#playground-anchor" class="btn-pill-sm">
-            <i class="fa-solid fa-terminal"></i> Live Playground
-          </a>
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill-bar" style="width: 0%;"></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ========================================================================
-       MAIN APP WORKSPACE: SIDEBAR + CURRICULUM + VISUALIZERS
-       ======================================================================== -->
+  <!-- Main Body Application -->
   <main class="main-wrapper">
-    <!-- Category Filter Bar -->
-    <div class="category-filter-strip" id="category-filter-bar"></div>
+    <!-- Category Filter Strip -->
+    <div class="cat-bar" id="category-bar"></div>
 
-    <!-- LEFT SIDEBAR: TOPIC DIRECTORY -->
+    <!-- Left Topic Explorer -->
     <aside class="topic-sidebar">
-      <div class="sidebar-header">
-        <h3><i class="fa-solid fa-compass"></i> Python Modules</h3>
-        <span class="badge-count">16 Topics</span>
+      <div class="sidebar-head">
+        <span><i class="fa-solid fa-list-check"></i> 16 Python Chapters</span>
       </div>
-      <ul class="topic-list-scroll" id="topic-nav-list">
-        <!-- Rendered dynamically by app.js -->
-      </ul>
+      <ul class="topic-scroll" id="topic-list-el"></ul>
     </aside>
 
-    <!-- RIGHT PANE: ACTIVE TOPIC STAGE -->
-    <div class="topic-content-pane" id="topic-content-section">
-      <!-- Active Topic Card -->
-      <article class="topic-card">
-        <div class="topic-header-row">
+    <!-- Right Topic Main Stage -->
+    <div class="stage-wrapper">
+      <article class="card-box">
+        <div class="stage-header">
           <div>
-            <div class="topic-meta-tags">
-              <span class="category-tag" id="topic-category-tag">Foundation</span>
-            </div>
-            <h2 id="topic-title">Loading topic...</h2>
+            <span class="cat-badge" id="topic-cat-badge">Foundation</span>
+            <h2 id="topic-heading" style="font-size:1.6rem; font-weight:800;">Topic Title</h2>
           </div>
-          <button class="btn-complete-topic" id="mark-complete-btn">
-            <i class="fa-regular fa-circle"></i> Mark as Completed (+100 XP)
-          </button>
+          <button class="btn-action sec" id="mark-done-btn"><i class="fa-regular fa-circle"></i> Mark Done (+100 XP)</button>
         </div>
+        <p id="topic-summary-text" style="color:var(--text-muted);"></p>
 
-        <p class="topic-summary" id="topic-desc"></p>
-
-        <!-- Perspective Switcher: ELI10 vs Under The Hood -->
-        <div class="perspective-bar">
-          <button class="perspective-tab active" data-mode="eli10">
-            <i class="fa-solid fa-child-reaching"></i> Explain Like I'm 10 (Analogy)
-          </button>
-          <button class="perspective-tab" data-mode="deepdive">
-            <i class="fa-solid fa-gears"></i> Under the Hood (CPython Internals)
-          </button>
+        <!-- Perspective Switcher (ELI10 vs Deep Dive) -->
+        <div class="persp-bar">
+          <button class="persp-btn active" id="btn-eli10"><i class="fa-solid fa-child"></i> Explain Like I'm 10</button>
+          <button class="persp-btn" id="btn-deep"><i class="fa-solid fa-gears"></i> Under the Hood</button>
         </div>
-
-        <div class="perspective-content-panel active" id="view-eli10">
-          <p id="eli10-text"></p>
-        </div>
-        <div class="perspective-content-panel" id="view-deepdive">
-          <p id="deepdive-text"></p>
-        </div>
+        <div class="persp-content" id="persp-box"></div>
 
         <!-- Code Showcase -->
-        <div class="code-showcase">
-          <div class="code-header-bar">
-            <div class="mac-dots">
-              <span class="mac-dot dot-red"></span>
-              <span class="mac-dot dot-yellow"></span>
-              <span class="mac-dot dot-green"></span>
-            </div>
-            <span><i class="fa-brands fa-python"></i> example_code.py</span>
-            <span>UTF-8</span>
+        <div class="code-container">
+          <div class="code-bar">
+            <span>example.py</span>
+            <span>Python 3.12</span>
           </div>
-          <pre><code id="topic-code-display"># Python code snippet</code></pre>
+          <pre><code id="code-snippet-box"></code></pre>
         </div>
 
         <!-- Key Takeaways -->
-        <div class="takeaways-box">
-          <h4><i class="fa-solid fa-lightbulb"></i> Key Takeaways to Remember</h4>
-          <ul id="key-takeaways-list"></ul>
+        <div class="takeaways-wrap">
+          <h4><i class="fa-solid fa-sparkles"></i> Essential Takeaways</h4>
+          <ul id="takeaways-list"></ul>
         </div>
 
-        <!-- Action Bar: Quiz & Try Snippet -->
-        <div class="topic-footer-action">
-          <button class="toy-action-btn" id="launch-topic-quiz-btn">
-            <i class="fa-solid fa-bolt"></i> Test Your Knowledge (Quiz)
-          </button>
-          <a href="#playground-anchor" class="toy-action-btn secondary">
-            <i class="fa-solid fa-play"></i> Try in Playground &darr;
-          </a>
+        <!-- Quiz Launch Trigger -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+          <button class="btn-action" id="open-quiz-btn"><i class="fa-solid fa-bolt"></i> Test Your Knowledge (Quiz)</button>
+          <a href="#play-anchor" class="btn-action sec"><i class="fa-solid fa-play"></i> Try in Playground &darr;</a>
         </div>
       </article>
 
-      <!-- ====================================================================
-           CREATIVE VISUALIZERS ARENA ("LIKE NO ONE DID IT")
-           ==================================================================== -->
-      <section class="visualizer-arena">
-        <div class="arena-header">
-          <div class="arena-title">
-            <i class="fa-solid fa-atom fa-spin text-cyan"></i>
-            <h3>Visual Mental Model Arena</h3>
-          </div>
-          <div class="toy-nav-tabs">
-            <button class="toy-nav-tab active" data-toy="slicer"><i class="fa-solid fa-scissors"></i> String Slicer</button>
-            <button class="toy-nav-tab" data-toy="memory"><i class="fa-solid fa-microchip"></i> Memory Boxes</button>
-            <button class="toy-nav-tab" data-toy="branch"><i class="fa-solid fa-code-fork"></i> Decision River</button>
-            <button class="toy-nav-tab" data-toy="conveyor"><i class="fa-solid fa-arrows-rotate"></i> Loop Conveyor</button>
-            <button class="toy-nav-tab" data-toy="blender"><i class="fa-solid fa-blender"></i> Function Blender</button>
-            <button class="toy-nav-tab" data-toy="blueprint"><i class="fa-solid fa-shapes"></i> OOP Blueprint</button>
+      <!-- Visual Mental Model Arena -->
+      <section class="card-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+          <h3 style="font-size:1.15rem; font-weight:800;"><i class="fa-solid fa-atom fa-spin text-cyan"></i> Visual Interactive Toys</h3>
+          <div class="toy-nav" id="toy-nav-buttons">
+            <button class="toy-tab-btn active" onclick="loadToy('slicer')"><i class="fa-solid fa-scissors"></i> String Slicer</button>
+            <button class="toy-tab-btn" onclick="loadToy('memory')"><i class="fa-solid fa-microchip"></i> RAM Boxes</button>
+            <button class="toy-tab-btn" onclick="loadToy('branch')"><i class="fa-solid fa-code-fork"></i> Decision River</button>
+            <button class="toy-tab-btn" onclick="loadToy('conveyor')"><i class="fa-solid fa-arrows-rotate"></i> Loop Conveyor</button>
+            <button class="toy-tab-btn" onclick="loadToy('blender')"><i class="fa-solid fa-blender"></i> Function Blender</button>
           </div>
         </div>
-
-        <!-- Dynamic Container for Active Visual Toy -->
-        <div id="toy-container"></div>
+        <div id="toy-stage"></div>
       </section>
 
-      <!-- ====================================================================
-           LIVE IN-BROWSER CODE PLAYGROUND (PYODIDE & SIMULATOR)
-           ==================================================================== -->
-      <section class="code-playground-card" id="playground-anchor">
-        <div class="playground-header">
-          <div class="playground-title">
-            <i class="fa-solid fa-terminal text-cyan"></i>
-            <h3>Interactive Python Playground</h3>
-            <span class="engine-pill" id="engine-status">
-              <span class="pulse-dot"></span> Loading Engine...
-            </span>
-          </div>
-          <div class="playground-toolbar">
-            <button class="btn-pill-sm" id="reset-code-btn" title="Reset snippet to topic default">
-              <i class="fa-solid fa-rotate-left"></i> Reset
-            </button>
-            <button class="btn-pill-sm" id="copy-code-btn" title="Copy code to clipboard">
-              <i class="fa-solid fa-copy"></i> Copy
-            </button>
-            <button class="btn-pill-sm" id="clear-output-btn" title="Clear console">
-              <i class="fa-solid fa-eraser"></i> Clear
-            </button>
-            <button class="toy-action-btn" id="run-code-btn">
-              <i class="fa-solid fa-play"></i> Run Code
-            </button>
+      <!-- Live Code Playground -->
+      <section class="card-box" id="play-anchor">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+          <h3 style="font-size:1.15rem; font-weight:800;"><i class="fa-solid fa-terminal"></i> In-Browser Python Runner</h3>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn-action sec" id="clear-btn" style="padding:0.4rem 0.8rem; font-size:0.8rem;">Clear</button>
+            <button class="btn-action" id="run-btn"><i class="fa-solid fa-play"></i> Run Code</button>
           </div>
         </div>
-
-        <div class="editor-split-view">
+        <div class="play-grid">
           <div class="editor-pane">
-            <div class="pane-bar">
-              <span>Python 3 Code Input (Editable)</span>
-              <span>Press Run to Execute</span>
-            </div>
-            <textarea id="playground-code" spellcheck="false" placeholder="# Type Python code here..."></textarea>
+            <div class="pane-head">Python Input (Editable)</div>
+            <textarea id="code-input" spellcheck="false"></textarea>
           </div>
           <div class="output-pane">
-            <div class="pane-bar">
-              <span>Console Output Terminal (stdout / stderr)</span>
-              <span>Live Output</span>
-            </div>
-            <pre id="playground-output">Ready. Click 'Run Code' to execute your Python script.</pre>
+            <div class="pane-head">Console Output Terminal</div>
+            <pre id="code-output">Ready. Click 'Run Code' to execute.</pre>
           </div>
         </div>
       </section>
     </div>
   </main>
 
-  <!-- ========================================================================
-       INTERACTIVE QUIZ MODAL
-       ======================================================================== -->
+  <!-- Interactive Quiz Modal -->
   <div class="modal-overlay" id="quiz-modal">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3 id="quiz-modal-title"><i class="fa-solid fa-circle-question text-cyan"></i> Python Knowledge Challenge</h3>
-        <button class="modal-close-btn" id="close-quiz-btn">&times;</button>
+    <div class="modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h3 id="quiz-title" style="font-size:1.1rem; font-weight:800;">Module Quiz Challenge</h3>
+        <button onclick="closeQuiz()" style="background:transparent; border:none; color:var(--text-muted); font-size:1.4rem; cursor:pointer;">&times;</button>
       </div>
-      <div class="modal-body" id="quiz-content-area">
-        <div class="quiz-status-row">
-          <span id="quiz-progress-text">Question 1 of 3</span>
-        </div>
-        <div class="quiz-progress-track">
-          <div class="quiz-progress-fill" id="quiz-progress-bar" style="width: 0%;"></div>
-        </div>
-
-        <h4 class="quiz-question-heading" id="quiz-question-text">Loading question...</h4>
-
-        <div class="quiz-options-list" id="quiz-options-box"></div>
-
-        <div class="quiz-explanation" id="quiz-explanation-box" style="display: none;"></div>
-
-        <div style="text-align: right;">
-          <button class="toy-action-btn" id="quiz-next-btn" style="display: none;">Next Question &rarr;</button>
+      <div id="quiz-body-content">
+        <p id="quiz-q-num" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.4rem;"></p>
+        <h4 id="quiz-question-txt" style="font-size:1.1rem; margin-bottom:1.2rem;"></h4>
+        <div id="quiz-options-wrapper"></div>
+        <div class="q-expl" id="quiz-expl-box"></div>
+        <div style="text-align:right; margin-top:1rem;">
+          <button class="btn-action" id="quiz-next-btn" style="display:none;">Next &rarr;</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ========================================================================
-       CHEAT SHEET MODAL
-       ======================================================================== -->
-  <div class="modal-overlay" id="cheatsheet-modal">
-    <div class="modal-box" style="max-width: 850px;">
-      <div class="modal-header">
-        <h3><i class="fa-solid fa-book-bookmark text-cyan"></i> Python Syntax Cheat Sheet</h3>
-        <button class="modal-close-btn" id="close-cheatsheet-btn">&times;</button>
-      </div>
-      <div class="modal-body">
-        <table class="cheat-table">
-          <thead>
-            <tr>
-              <th>Concept</th>
-              <th>Syntax Pattern</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Print & F-Strings</td>
-              <td><code>print(f"Hi, {name}!")</code></td>
-              <td>Outputs formatted string with interpolated variables</td>
-            </tr>
-            <tr>
-              <td>String Slicing</td>
-              <td><code>seq[start:stop:step]</code></td>
-              <td>Extracts sub-sequence (stop index is excluded)</td>
-            </tr>
-            <tr>
-              <td>List Comprehension</td>
-              <td><code>[x*2 for x in nums if x>0]</code></td>
-              <td>Concise, readable syntax for generating new lists</td>
-            </tr>
-            <tr>
-              <td>Dictionary Safe Lookup</td>
-              <td><code>dict.get(key, default)</code></td>
-              <td>Returns fallback instead of throwing KeyError</td>
-            </tr>
-            <tr>
-              <td>Try / Except</td>
-              <td><code>try: ... except Err: ...</code></td>
-              <td>Catches runtime exceptions gracefully</td>
-            </tr>
-            <tr>
-              <td>Context Manager</td>
-              <td><code>with open("file.txt") as f:</code></td>
-              <td>Guarantees resources and file streams are closed properly</td>
-            </tr>
-            <tr>
-              <td>Class Definition</td>
-              <td><code>class Hero(Parent):</code></td>
-              <td>Defines class with inheritance and methods</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+  <!-- COMPLETE BUNDLED APPLICATION LOGIC & TOPICS DATABASE -->
+  <script>
+    // 16 COMPLETE PYTHON CHAPTERS
+    const TOPICS = [
+      {
+        id: "intro",
+        cat: "Foundation",
+        title: "1. Introduction & The Python Mindset",
+        desc: "How Python compiles to bytecode and executes on the Python Virtual Machine (PVM).",
+        eli10: "Think of Python like talking to a helpful robot in simple English. You write instructions, and it follows them line by line without complaints!",
+        deep: "CPython compiles `.py` source code into intermediate bytecode (`.pyc`), executed by the stack-based Python Virtual Machine. No manual memory management is required.",
+        code: `# Your very first Python line!\nprint("Hello, Python Explorer! 🚀")\n\n# Indentation defines blocks, not curly braces\nhero = "Ada Lovelace"\npower = 9001\nprint(f"Hero: {hero} | Power: {power}")`,
+        snippet: `print("Welcome to PyQuest!")\nx = 10\ny = 20\nprint(f"{x} + {y} = {x + y}")`,
+        takeaways: ["Python uses 4 spaces indentation to define code blocks.", "print() outputs data to the terminal.", "Comments start with # and are ignored by Python."],
+        toy: "slicer"
+      },
+      {
+        id: "variables",
+        cat: "Foundation",
+        title: "2. Variables, Memory & Dynamic Types",
+        desc: "Variables are labeled sticky notes pointing to memory objects, not rigid storage boxes.",
+        eli10: "A variable is like a sticky name tag you put on a toy. You can move the tag 'favorite' from a dinosaur to a spaceship anytime!",
+        deep: "Python variables are references (pointers) to heap objects. id(x) returns the memory address. Everything is an object in Python.",
+        code: `score = 50          # int\nrate = 19.99        # float\nuser = "Kiran"      # str\nis_active = True    # bool\n\n# Dynamic reassignment:\nmystery = 100\nmystery = "Now text!"\nprint(type(mystery)) # <class 'str'>`,
+        snippet: `val = 42\nprint("Value:", val, "| Type:", type(val))\nval = "Python is dynamic!"\nprint("New Value:", val, "| Type:", type(val))`,
+        takeaways: ["Variables use snake_case naming conventions.", "type(x) reveals any object's data type.", "Variables point to objects in heap memory."],
+        toy: "memory"
+      },
+      {
+        id: "types",
+        cat: "Foundation",
+        title: "3. Core Data Types & Casting",
+        desc: "Convert effortlessly between int, float, str, bool, and understand truthiness.",
+        eli10: "Data types are like different Lego pieces. Some are numbers for math, some are words for reading. Casting is melting ice into water!",
+        deep: "Python 3 has unbounded int precision. Falsy values evaluate to False in conditions: 0, 0.0, '', [], {}, None.",
+        code: `raw_age = "24"\nnum_age = int(raw_age)   # Cast string -> integer\nprint(num_age + 6)       # 30\n\nprint(bool(""))          # False (empty is falsy)\nprint(bool("Hi"))        # True (non-empty is truthy)`,
+        snippet: `price_str = "150"\ntax_rate = 0.18\ntotal = int(price_str) * (1 + tax_rate)\nprint(f"Total: \${total:.2f}")`,
+        takeaways: ["int() converts strings to integers.", "float() converts to decimal.", "Empty sequences are falsy."],
+        toy: "memory"
+      },
+      {
+        id: "operators",
+        cat: "Foundation",
+        title: "4. Operators: Math & Logic",
+        desc: "Master arithmetic, comparison, logical short-circuiting, and '==' vs 'is'.",
+        eli10: "Operators are math symbols and truth judges! Math operators add and multiply, while comparison checks who has more candy.",
+        deep: "Floor division // chops decimals. Modulo % returns remainder. '==' compares equality of value; 'is' checks identical memory identity.",
+        code: `print(17 // 5)   # 3 (Floor division)\nprint(17 % 5)    # 2 (Remainder)\nprint(2 ** 4)    # 16 (Exponentiation)\n\n# Identity vs Equality\na = [1, 2]\nb = [1, 2]\nprint(a == b)    # True (same values)\nprint(a is b)    # False (different memory addresses)`,
+        snippet: `minutes = 135\nhours = minutes // 60\nrem = minutes % 60\nprint(f"{minutes} mins = {hours} hr(s) & {rem} min(s)")`,
+        takeaways: ["/ always returns a float; // returns integer floor.", "== checks values; is checks memory identity.", "% 2 == 0 checks if a number is even."],
+        toy: "branch"
+      },
+      {
+        id: "strings",
+        cat: "Data & Text",
+        title: "5. Strings & The Visual Slicing Knife",
+        desc: "Zero-based indexing, [start:stop:step], f-strings, and string immutability.",
+        eli10: "Strings are necklaces of letter beads! Each bead has an index number. Slicing is using scissors to cut out exactly the beads you want.",
+        deep: "Strings are immutable sequences of Unicode codepoints. seq[start:stop:step] excludes stop. seq[::-1] reverses strings in O(N).",
+        code: `s = "PYTHONISTA"\nprint(s[0])       # 'P'\nprint(s[0:6])     # 'PYTHON'\nprint(s[6:])      # 'ISTA'\nprint(s[::-1])    # 'ATSINOHTYP' (Reversed!)\n\n# F-Strings:\nlevel = 9\nprint(f"Level: {level:02d}") # Level: 09`,
+        snippet: `word = "DEVELOPER"\nprint("First 3:", word[:3])\nprint("Middle:", word[3:6])\nprint("Reversed:", word[::-1])`,
+        takeaways: ["Indexing starts at 0, not 1! Negative indices count from the end.", "[start:stop] excludes stop.", "Strings cannot be changed in place (immutable)."],
+        toy: "slicer"
+      },
+      {
+        id: "conditionals",
+        cat: "Control Flow",
+        title: "6. Conditionals: If, Elif, Else",
+        desc: "Guide program logic with clean branches, nested conditions, and ternary expressions.",
+        eli10: "Conditionals are like a fork in the road with signs. If it rains, open umbrella. Else if it's sunny, put on sunglasses!",
+        deep: "Conditionals evaluate boolean truth values. Python short-circuits evaluation. One-line ternary syntax: x if cond else y.",
+        code: `temp = 25\nis_raining = False\n\nif temp > 30:\n    print("🔥 Hot day")\nelif temp > 20 and not is_raining:\n    print("🌤️ Ideal weather")\nelse:\n    print("🌧️ Take umbrella")\n\nstatus = "Adult" if temp >= 18 else "Minor"`,
+        snippet: `battery = 45\nstatus = "High" if battery >= 80 else ("Medium" if battery >= 30 else "Low")\nprint(f"Battery: {battery}% ({status})")`,
+        takeaways: ["elif is short for else if.", "Conditions execute top-down and stop at the first match.", "Indent 4 spaces inside blocks."],
+        toy: "branch"
+      },
+      {
+        id: "loops",
+        cat: "Control Flow",
+        title: "7. Loops: For, While & Conveyor Belts",
+        desc: "Automate repetitive tasks with range(), enumerate(), break, and continue.",
+        eli10: "Loops are playlists on repeat! A for loop plays every song in your playlist once. A while loop plays music as long as you dance!",
+        deep: "Python for loops are iterator consumers. range() generates lazy arithmetic progressions in O(1) memory. for-else runs if no break occurred.",
+        code: `for i in range(1, 6):\n    print(f"Count: {i}")\n\nfruits = ["Apple", "Banana", "Cherry"]\nfor idx, fruit in enumerate(fruits, start=1):\n    print(f"{idx}. {fruit}")\n\ncount = 3\nwhile count > 0:\n    print(count)\n    count -= 1\nprint("Blastoff! 🚀")`,
+        snippet: `total = sum([n for n in range(1, 11)])\nprint("Sum 1 to 10:", total)`,
+        takeaways: ["range(5) counts 0, 1, 2, 3, 4 (stops before 5).", "enumerate() gives both index and value.", "break exits loop; continue skips iteration."],
+        toy: "conveyor"
+      },
+      {
+        id: "functions",
+        cat: "Architecture",
+        title: "8. Functions: The Magic Processing Blender",
+        desc: "Modular code with def, return values, *args, **kwargs, and LEGB scope.",
+        eli10: "A function is a kitchen blender! You put ingredients in (parameters), press the button, and out pours fresh smoothie (return value)!",
+        deep: "Functions are first-class objects. Variables resolve via LEGB (Local, Enclosing, Global, Built-in). Default parameters evaluate at definition time.",
+        code: `def calculate_xp(level, multiplier=1.5):\n    \"\"\"Calculates experience points.\"\"\"\n    return int(level * 100 * multiplier)\n\nprint("XP:", calculate_xp(5))\n\n# Flexible arguments *args and **kwargs\ndef team(name, *members):\n    print(f"Team {name}: {', '.join(members)}")\n\nteam("Titans", "Alex", "Sam", "Robin")`,
+        snippet: `def greet(name, title="Explorer"):\n    return f"Welcome, {title} {name}!"\n\nprint(greet("Kiran"))\nprint(greet("Maya", "Grandmaster"))`,
+        takeaways: ["def defines a function; return sends output back.", "Missing return implicitly returns None.", "Local variables vanish after function completes."],
+        toy: "blender"
+      },
+      {
+        id: "lists",
+        cat: "Data Structures",
+        title: "9. Lists & Tuples: Mutable vs Immutable",
+        desc: "Dynamic arrays, list methods, tuple unpacking, and slick List Comprehensions.",
+        eli10: "A list [ ] is a whiteboard you can write on and erase anytime. A tuple ( ) is carved in stone: once made, it can never change!",
+        deep: "Lists are dynamic pointer arrays with amortized O(1) appends. List comprehensions [x for x in seq] compile into bytecode loops.",
+        code: `items = ["Map", "Torch"]\nitems.append("Compass")\nitems.insert(1, "Potion")\nprint(items)\n\n# List Comprehension:\nnums = [1, 2, 3, 4, 5, 6]\nevens_sq = [n**2 for n in nums if n % 2 == 0]\nprint("Evens squared:", evens_sq) # [4, 16, 36]\n\n# Tuple Unpacking:\npoint = (1920, 1080)\nw, h = point`,
+        snippet: `words = ["code", "python", "dev", "hacker"]\nupper_short = [w.upper() for w in words if len(w) <= 4]\nprint("Short words:", upper_short)`,
+        takeaways: ["Lists use [] and are mutable.", "Tuples use () and are immutable.", "List comprehensions offer concise, fast sequence generation."],
+        toy: "conveyor"
+      },
+      {
+        id: "dicts",
+        cat: "Data Structures",
+        title: "10. Dictionaries & Sets: Hash Maps",
+        desc: "Harness lightning-fast O(1) key-value lookups with Dictionaries and uniqueness with Sets.",
+        eli10: "A dictionary {key: val} is a real phonebook: look up a name to get their number instantly! A Set is a bouncer that kicks out duplicate items!",
+        deep: "Dicts and sets use hash tables. Keys must be hashable and immutable. Lookup, insertion, and deletion are O(1) average time.",
+        code: `hero = {"name": "Neo", "role": "Hacker", "hp": 100}\n# Safe get() prevents KeyError\nprint(hero.get("mana", 50)) # Fallback 50\n\n# Sets strip duplicates\nguests = set(["Alice", "Bob", "Alice", "Charlie"])\nprint(guests) # {'Alice', 'Bob', 'Charlie'}\n\na = {1, 2, 3}\nb = {3, 4, 5}\nprint("Intersection:", a & b) # {3}`,
+        snippet: `counts = {}\nfor word in ["apple", "banana", "apple", "cherry", "banana"]:\n    counts[word] = counts.get(word, 0) + 1\nprint("Frequencies:", counts)`,
+        takeaways: ["Use dict.get(key, default) to prevent KeyError.", "Dict keys must be immutable.", "Sets automatically eliminate duplicates."],
+        toy: "memory"
+      },
+      {
+        id: "errors",
+        cat: "Resilience",
+        title: "11. Error Handling: Try, Except, Finally",
+        desc: "Prevent application crashes using structured exception handling.",
+        eli10: "Try-except is like wearing knee pads when roller-skating! If you trip (error happens), your pads catch you safely so you keep skating!",
+        deep: "Exceptions inherit from BaseException. else runs only if try succeeded; finally runs unconditionally.",
+        code: `try:\n    num = int("abc")\nexcept ValueError as err:\n    print(f"⚠️ Caught error: {err}")\nelse:\n    print("Success without errors!")\nfinally:\n    print("Always runs for cleanup.")`,
+        snippet: `def safe_div(a, b):\n    try:\n        return a / b\n    except ZeroDivisionError:\n        return "Cannot divide by 0!"\n\nprint("10/2 =", safe_div(10, 2))\nprint("10/0 =", safe_div(10, 0))`,
+        takeaways: ["Always catch specific exceptions (e.g. ValueError).", "finally runs no matter what.", "raise manually throws an exception."],
+        toy: "branch"
+      },
+      {
+        id: "files",
+        cat: "System",
+        title: "12. File Handling: Reading & Writing Data",
+        desc: "Safely open, read, write, and append files using context managers.",
+        eli10: "File handling is opening a notebook, reading words, scribbling notes, and closing it cleanly so no pages tear!",
+        deep: "The 'with open()' context manager implements __enter__ and __exit__, guaranteeing file descriptor closure even on exceptions.",
+        code: `# Writing with context manager\nwith open("log.txt", "w", encoding="utf-8") as f:\n    f.write("System online\\n")\n\n# Reading\nwith open("log.txt", "r", encoding="utf-8") as f:\n    data = f.read()\n    print(data)`,
+        snippet: `lines = ["user1,85\\n", "user2,92\\n"]\nfor line in lines:\n    u, s = line.strip().split(",")\n    print(f"{u} scored {s} points")`,
+        takeaways: ["Always use 'with open()' to avoid leaking file descriptors.", "'w' overwrites, 'a' appends.", "Use encoding='utf-8'."],
+        toy: "blender"
+      },
+      {
+        id: "modules",
+        cat: "Architecture",
+        title: "13. Modules & Standard Library",
+        desc: "Tap into math, random, datetime, and understand if __name__ == '__main__':",
+        eli10: "Modules are toolboxes made by other inventors! Instead of building a clock from scratch, you just open the datetime toolbox!",
+        deep: "__name__ evaluates to '__main__' only when executed directly, allowing dual-use libraries and scripts.",
+        code: `import math\nimport random\n\nprint("Pi:", round(math.pi, 4))\nprint("Roll dice:", random.randint(1, 6))\n\nif __name__ == "__main__":\n    print("Executed directly as main script!")`,
+        snippet: `import random\nchoices = ["Heads", "Tails"]\nflips = [random.choice(choices) for _ in range(5)]\nprint("Flips:", flips)`,
+        takeaways: ["import module imports entire library.", "from module import x imports specific items.", "Python standard library comes pre-installed."],
+        toy: "blender"
+      },
+      {
+        id: "oop",
+        cat: "OOP",
+        title: "14. OOP Fundamentals: Classes & Objects",
+        desc: "Model real entities using Classes as blueprints and Objects as instances.",
+        eli10: "A Class is a blueprint for a toy car. The Object is the actual plastic toy car you build from that blueprint!",
+        deep: "Classes bundle state and behavior. __init__ is the initializer constructor. self refers to the instance.",
+        code: `class Hero:\n    def __init__(self, name, health=100):\n        self.name = name\n        self.health = health\n\n    def take_damage(self, dmg):\n        self.health = max(0, self.health - dmg)\n        print(f"{self.name} took {dmg} dmg! HP: {self.health}")\n\nh1 = Hero("Neo", 120)\nh1.take_damage(30)`,
+        snippet: `class Car:\n    def __init__(self, brand, color):\n        self.brand = brand\n        self.color = color\n    def honk(self):\n        return f"{self.color} {self.brand} goes Beep!"\n\nc = Car("Tesla", "Blue")\nprint(c.honk())`,
+        takeaways: ["class defines blueprint; objects are instances.", "__init__ is the constructor.", "self represents the current object."],
+        toy: "blueprint"
+      },
+      {
+        id: "inheritance",
+        cat: "OOP",
+        title: "15. OOP: Inheritance & Polymorphism",
+        desc: "Reuse code by inheriting from parent classes and overriding methods.",
+        eli10: "Inheritance is kids getting traits from parents! A smartphone inherits phone traits (calling), and adds camera superpowers!",
+        deep: "Subclasses inherit methods. super().__init__() invokes parent constructor. Polymorphism lets different classes share method names.",
+        code: `class Animal:\n    def __init__(self, name):\n        self.name = name\n    def speak(self):\n        return "Sound"\n\nclass Dog(Animal):\n    def speak(self):\n        return "Woof! 🐕"\n\nclass Cat(Animal):\n    def speak(self):\n        return "Meow! 🐱"\n\nfor pet in [Dog("Rex"), Cat("Luna")]:\n    print(f"{pet.name}: {pet.speak()}")`,
+        snippet: `class Vehicle:\n    def speed(self):\n        return 60\nclass Rocket(Vehicle):\n    def speed(self):\n        return 17500\nprint("Rocket speed:", Rocket().speed(), "mph")`,
+        takeaways: ["class Child(Parent): creates inheritance.", "super() accesses parent class.", "Polymorphism enables common interfaces."],
+        toy: "blueprint"
+      },
+      {
+        id: "projects",
+        cat: "Projects",
+        title: "16. Three Hands-on Mini Projects",
+        desc: "Build a Number Guesser, Password Generator, and Task Manager.",
+        eli10: "Now you take all your Lego pieces and assemble working games and tools from scratch!",
+        deep: "Projects synthesize state management, conditionals, loops, functions, and collections into complete apps.",
+        code: `import random\nimport string\n\n# Project: Random Password Generator\ndef make_pwd(length=12):\n    chars = string.ascii_letters + string.digits + "!@#$%*"\n    return "".join(random.choice(chars) for _ in range(length))\n\nprint("Generated Pwd:", make_pwd(14))`,
+        snippet: `import random\ndef guess_game(secret=7, guess=7):\n    return "🎉 Won!" if guess == secret else "Try again!"\nprint(guess_game())`,
+        takeaways: ["Break complex software into small functions.", "Test edge cases.", "Practice daily."],
+        toy: "blender"
+      }
+    ];
 
-  <!-- ========================================================================
-       FOOTER
-       ======================================================================== -->
-  <footer class="site-footer">
-    <div class="footer-content">
-      <div class="footer-brand">
-        <div class="brand-wrapper">
-          <div class="brand-icon"><i class="fa-brands fa-python"></i></div>
-          <div class="brand-text">
-            <h3>PyQuest</h3>
-            <p>Empowering the next generation of Python developers.</p>
+    // QUIZZES DATABASE
+    const QUIZZES = {
+      "intro": [
+        { q: "Who created Python and when was it released?", opts: ["Dennis Ritchie (1972)", "Guido van Rossum (1991)", "James Gosling (1995)", "Bjarne Stroustrup (1985)"], a: 1, exp: "Python was conceived by Guido van Rossum and released in 1991." },
+        { q: "How does Python define code blocks?", opts: ["Curly braces {}", "Semicolons ;", "Indentation (whitespace)", "BEGIN/END"], a: 2, exp: "Python strictly relies on indentation to delimit blocks." }
+      ],
+      "variables": [
+        { q: "Which variable name is VALID in Python?", opts: ["2nd_player", "user-score", "player_score_2", "class"], a: 2, exp: "Variables cannot begin with digits or use reserved keywords." },
+        { q: "What function reveals an object's memory address?", opts: ["type()", "id()", "address()", "memory()"], a: 1, exp: "id(x) returns the unique identity/memory address of an object." }
+      ],
+      "types": [
+        { q: "What does int(7.89) evaluate to?", opts: ["8", "7", "7.89", "Error"], a: 1, exp: "int() truncates (chops off) the decimal part." },
+        { q: "Which of the following is FALSY in Python?", opts: ["bool('False')", "bool([0])", "bool([])", "bool(42)"], a: 2, exp: "Empty collections like [] are falsy." }
+      ],
+      "operators": [
+        { q: "What does 17 // 5 evaluate to?", opts: ["3.4", "3", "4", "2"], a: 1, exp: "// performs floor division, rounding down to 3." },
+        { q: "What is the difference between '==' and 'is'?", opts: ["== checks values; is checks memory identity", "is checks values; == checks identity", "They are identical", "is is for numbers only"], a: 0, exp: "== evaluates value equality, is checks identical memory address." }
+      ],
+      "strings": [
+        { q: "Given s = 'PYTHON', what is s[1:4]?", opts: ["'PYT'", "'YTH'", "'YTHO'", "'PYTHON'"], a: 1, exp: "Index 1 is 'Y', 2 is 'T', 3 is 'H'. Index 4 is excluded." },
+        { q: "How do you reverse a string s in Python?", opts: ["s.reverse()", "s[::-1]", "reverse(s)", "s[-1:0]"], a: 1, exp: "s[::-1] steps backward through the sequence." }
+      ],
+      "conditionals": [
+        { q: "What is the Python keyword for 'else if'?", opts: ["else if", "elseif", "elif", "case"], a: 2, exp: "Python uses 'elif'." },
+        { q: "What is Python's ternary syntax?", opts: ["cond ? a : b", "a if cond else b", "if cond then a else b", "a ? cond : b"], a: 1, exp: "Python uses 'val_true if cond else val_false'." }
+      ]
+    };
+
+    // APP CONTROLLER
+    let currentId = "intro";
+    let currentCat = "All";
+    let currentMode = "eli10";
+    let xp = parseInt(localStorage.getItem("pq_xp") || "0", 10);
+    let streak = parseInt(localStorage.getItem("pq_strk") || "0", 10);
+    let completed = new Set(JSON.parse(localStorage.getItem("pq_comp") || "[]"));
+
+    function init() {
+      initTheme();
+      renderCategories();
+      renderSidebar();
+      renderTopic(currentId);
+      loadToy("slicer");
+      updateHUD();
+
+      // Search Filter
+      document.getElementById("search-input").addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        document.querySelectorAll(".topic-item").forEach(item => {
+          const t = TOPICS.find(top => top.id === item.dataset.id);
+          const match = !query || t.title.toLowerCase().includes(query) || t.desc.toLowerCase().includes(query);
+          item.style.display = match ? "flex" : "none";
+        });
+      });
+
+      // Perspective Tabs
+      document.getElementById("btn-eli10").addEventListener("click", () => setPersp("eli10"));
+      document.getElementById("btn-deep").addEventListener("click", () => setPersp("deep"));
+
+      // Complete Button
+      document.getElementById("mark-done-btn").addEventListener("click", toggleComplete);
+
+      // Playground Runner
+      document.getElementById("run-btn").addEventListener("click", runCode);
+      document.getElementById("clear-btn").addEventListener("click", () => {
+        document.getElementById("code-output").textContent = "Cleared.";
+      });
+
+      // Quiz launch
+      document.getElementById("open-quiz-btn").addEventListener("click", () => launchQuiz(currentId));
+    }
+
+    // THEME SWITCHER
+    function initTheme() {
+      const saved = localStorage.getItem("pq_theme") || "dark";
+      setTheme(saved);
+      document.getElementById("theme-btn").addEventListener("click", () => {
+        const cur = document.documentElement.getAttribute("data-theme") || "dark";
+        setTheme(cur === "dark" ? "light" : "dark");
+      });
+    }
+
+    function setTheme(t) {
+      document.documentElement.setAttribute("data-theme", t);
+      localStorage.setItem("pq_theme", t);
+      const ico = document.getElementById("theme-ico");
+      const txt = document.getElementById("theme-txt");
+      if (t === "dark") {
+        ico.className = "fa-solid fa-moon";
+        txt.textContent = "Midnight Blue";
+      } else {
+        ico.className = "fa-solid fa-sun";
+        txt.textContent = "Sky Blue";
+      }
+    }
+
+    // TOPIC RENDERING
+    function renderCategories() {
+      const cats = ["All", "Foundation", "Control Flow", "Data & Text", "Data Structures", "Architecture", "Resilience", "OOP", "Projects"];
+      const bar = document.getElementById("category-bar");
+      bar.innerHTML = cats.map(c => `<button class="cat-btn ${c === currentCat ? 'active' : ''}" onclick="filterCat('${c}')">${c}</button>`).join("");
+    }
+
+    function filterCat(c) {
+      currentCat = c;
+      renderCategories();
+      renderSidebar();
+    }
+
+    function renderSidebar() {
+      const list = document.getElementById("topic-list-el");
+      list.innerHTML = TOPICS.map(t => {
+        if (currentCat !== "All" && t.cat !== currentCat) return "";
+        const isAct = t.id === currentId;
+        const isDone = completed.has(t.id);
+        return `
+          <li class="topic-item ${isAct ? 'active' : ''} ${isDone ? 'completed' : ''}" data-id="${t.id}" onclick="switchTopic('${t.id}')">
+            <span style="flex:1;">${t.title}</span>
+            ${isDone ? '<i class="fa-solid fa-circle-check check"></i>' : ''}
+          </li>
+        `;
+      }).join("");
+    }
+
+    function switchTopic(id) {
+      currentId = id;
+      renderSidebar();
+      renderTopic(id);
+    }
+
+    function renderTopic(id) {
+      const t = TOPICS.find(item => item.id === id) || TOPICS[0];
+      document.getElementById("topic-cat-badge").textContent = t.cat;
+      document.getElementById("topic-heading").textContent = t.title;
+      document.getElementById("topic-summary-text").textContent = t.desc;
+      document.getElementById("code-snippet-box").textContent = t.code;
+      document.getElementById("code-input").value = t.snippet;
+      document.getElementById("takeaways-list").innerHTML = t.takeaways.map(take => `<li><i class="fa-solid fa-sparkles"></i> ${take}</li>`).join("");
+
+      const isDone = completed.has(t.id);
+      const doneBtn = document.getElementById("mark-done-btn");
+      doneBtn.innerHTML = isDone ? '<i class="fa-solid fa-circle-check text-emerald"></i> Completed!' : '<i class="fa-regular fa-circle"></i> Mark Done (+100 XP)';
+
+      setPersp(currentMode);
+      if (t.toy) loadToy(t.toy);
+    }
+
+    function setPersp(mode) {
+      currentMode = mode;
+      document.getElementById("btn-eli10").classList.toggle("active", mode === "eli10");
+      document.getElementById("btn-deep").classList.toggle("active", mode === "deep");
+      const t = TOPICS.find(item => item.id === currentId);
+      document.getElementById("persp-box").textContent = mode === "eli10" ? t.eli10 : t.deep;
+    }
+
+    function toggleComplete() {
+      if (completed.has(currentId)) {
+        completed.delete(currentId);
+      } else {
+        completed.add(currentId);
+        addXP(100);
+      }
+      localStorage.setItem("pq_comp", JSON.stringify([...completed]));
+      renderSidebar();
+      renderTopic(currentId);
+      updateHUD();
+    }
+
+    function updateHUD() {
+      document.getElementById("xp-val").textContent = `${xp} XP`;
+      document.getElementById("streak-val").textContent = `${streak} 🔥`;
+      let rank = "Novice 🐣";
+      if (xp >= 1500) rank = "Grandmaster 🐉";
+      else if (xp >= 800) rank = "Pythonista 🧙‍♂️";
+      else if (xp >= 300) rank = "Explorer 🚀";
+      document.getElementById("rank-val").textContent = rank;
+
+      const pct = Math.round((completed.size / TOPICS.length) * 100);
+      document.getElementById("progress-pct").textContent = `${completed.size} / ${TOPICS.length} (${pct}%)`;
+      document.getElementById("progress-fill-bar").style.width = `${pct}%`;
+    }
+
+    function addXP(amount) {
+      xp += amount;
+      localStorage.setItem("pq_xp", xp);
+      updateHUD();
+    }
+
+    // VISUAL TOYS
+    function loadToy(toy) {
+      const stage = document.getElementById("toy-stage");
+      document.querySelectorAll(".toy-tab-btn").forEach(b => {
+        b.classList.toggle("active", b.getAttribute("onclick").includes(toy));
+      });
+
+      if (toy === "slicer") {
+        stage.innerHTML = `
+          <div class="slicer-card">
+            <h4><i class="fa-solid fa-scissors"></i> The Visual String Slicer Knife</h4>
+            <div class="slicer-controls">
+              <div><label>Word: </label><input type="text" id="s-word" value="PYTHONISTA" class="toy-tab-btn" style="background:var(--bg-input); color:var(--text-main); width:100%;"></div>
+              <div><label>Start: <span id="lbl-s">0</span></label><input type="range" id="sl-start" min="-10" max="10" value="0" style="width:100%;"></div>
+              <div><label>Stop: <span id="lbl-e">6</span></label><input type="range" id="sl-stop" min="-10" max="10" value="6" style="width:100%;"></div>
+              <div><label>Step: <span id="lbl-st">1</span></label><input type="range" id="sl-step" min="-3" max="3" value="1" style="width:100%;"></div>
+            </div>
+            <div class="slicer-tile-row" id="s-tiles"></div>
+            <div class="s-res" id="s-out">"PYTHON"</div>
           </div>
-        </div>
-      </div>
-      <div class="footer-meta">
-        <p>Built with <i class="fa-solid fa-heart" style="color: #f43f5e;"></i> &bull; Themes: <strong>Midnight Blue</strong> & <strong>Sky Blue</strong></p>
-      </div>
-    </div>
-  </footer>
+        `;
+        const updateSlicer = () => {
+          const w = document.getElementById("s-word").value || "PYTHON";
+          let s = parseInt(document.getElementById("sl-start").value, 10);
+          let e = parseInt(document.getElementById("sl-stop").value, 10);
+          let st = parseInt(document.getElementById("sl-step").value, 10) || 1;
+          document.getElementById("lbl-s").textContent = s;
+          document.getElementById("lbl-e").textContent = e;
+          document.getElementById("lbl-st").textContent = st;
 
-  <!-- Core Scripts -->
-  <script src="js/topics-data.js"></script>
-  <script src="js/quizzes-data.js"></script>
-  <script src="js/visualizers.js"></script>
-  <script src="js/app.js"></script>
+          let startIdx = s < 0 ? Math.max(0, w.length + s) : Math.min(w.length, s);
+          let stopIdx = e < 0 ? Math.max(0, w.length + e) : Math.min(w.length, e);
+          let selected = new Set();
+          let chars = [];
+          if (st > 0) {
+            for (let i = startIdx; i < stopIdx; i += st) { selected.add(i); chars.push(w[i]); }
+          }
+          document.getElementById("s-tiles").innerHTML = w.split("").map((ch, idx) => `
+            <div class="s-tile-node ${selected.has(idx) ? 'active' : ''}">
+              <span class="s-pos">+${idx}</span>
+              <div class="s-tile">${ch}</div>
+              <span class="s-neg">${idx - w.length}</span>
+            </div>
+          `).join("");
+          document.getElementById("s-out").textContent = `word[${s} : ${e} : ${st}] &rarr; "${chars.join("")}"`;
+        };
+        ["s-word", "sl-start", "sl-stop", "sl-step"].forEach(id => document.getElementById(id).addEventListener("input", updateSlicer));
+        updateSlicer();
+      } else if (toy === "memory") {
+        stage.innerHTML = `
+          <div class="slicer-card">
+            <h4><i class="fa-solid fa-microchip"></i> Variable Stack & Heap Inspector</h4>
+            <div style="display:flex; gap:1rem; margin-top:1rem; flex-wrap:wrap;">
+              <div style="flex:1; background:var(--bg-card); padding:1rem; border-radius:10px; border-left:4px solid var(--accent-sky);">
+                <strong>Variable Label (Stack)</strong>
+                <p style="font-family:monospace; margin-top:0.5rem; color:var(--accent-sky);">hero_score &rarr;</p>
+              </div>
+              <div style="flex:1; background:var(--bg-card); padding:1rem; border-radius:10px; border-left:4px solid var(--accent-emerald);">
+                <strong>Object in Memory (Heap)</strong>
+                <p style="font-family:monospace; margin-top:0.5rem; color:var(--accent-emerald);">&lt;class 'int'&gt; : 9500 (0x7ffe)</p>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (toy === "branch") {
+        stage.innerHTML = `
+          <div class="slicer-card">
+            <h4><i class="fa-solid fa-code-fork"></i> Conditionals Decision River</h4>
+            <div style="display:flex; gap:1rem; margin:1rem 0;">
+              <label><input type="checkbox" id="cond-t" checked> Has Ticket?</label>
+              <label><input type="checkbox" id="cond-a" checked> Age &ge; 18?</label>
+            </div>
+            <div id="branch-res" style="padding:0.8rem; background:var(--bg-card); border-radius:8px; font-weight:700; color:var(--accent-emerald);">
+              &rarr; Access Granted: Welcome to the event!
+            </div>
+          </div>
+        `;
+        const updBranch = () => {
+          const t = document.getElementById("cond-t").checked;
+          const a = document.getElementById("cond-a").checked;
+          const res = document.getElementById("branch-res");
+          if (t && a) {
+            res.textContent = "✅ Access Granted: Welcome to the event!";
+            res.style.color = "var(--accent-emerald)";
+          } else {
+            res.textContent = "🚫 Access Denied: Requires ticket & age >= 18";
+            res.style.color = "var(--accent-rose)";
+          }
+        };
+        document.getElementById("cond-t").addEventListener("change", updBranch);
+        document.getElementById("cond-a").addEventListener("change", updBranch);
+      } else if (toy === "conveyor") {
+        stage.innerHTML = `
+          <div class="slicer-card">
+            <h4><i class="fa-solid fa-arrows-rotate"></i> Loop Conveyor Belt</h4>
+            <div style="display:flex; gap:0.5rem; margin:1rem 0; overflow-x:auto;">
+              <span class="toy-tab-btn">🍎 Apple</span>
+              <span class="toy-tab-btn">🍌 Banana</span>
+              <span class="toy-tab-btn">🍒 Cherry</span>
+              <span class="toy-tab-btn">🍇 Grape</span>
+            </div>
+            <p style="color:var(--text-muted); font-size:0.85rem;">Python pulls each item one-by-one from the sequence into the loop variable.</p>
+          </div>
+        `;
+      } else {
+        stage.innerHTML = `
+          <div class="slicer-card">
+            <h4><i class="fa-solid fa-blender"></i> Magic Function Blender</h4>
+            <p style="margin:0.8rem 0; font-family:monospace; color:var(--accent-cyan);">calculate(a=7, b=8) &rarr; return a * b = 56</p>
+            <p style="color:var(--text-muted); font-size:0.85rem;">Parameters in &rarr; internal processing logic &rarr; return value out.</p>
+          </div>
+        `;
+      }
+    }
+
+    // PLAYGROUND RUNNER
+    function runCode() {
+      const code = document.getElementById("code-input").value;
+      const out = document.getElementById("code-output");
+      out.textContent = "Running...";
+      try {
+        let lines = [];
+        code.split("\n").forEach(line => {
+          line = line.trim();
+          if (line.startsWith("print(") && line.endsWith(")")) {
+            let inner = line.slice(6, -1).replace(/["']/g, "");
+            lines.push(inner);
+          }
+        });
+        out.textContent = lines.length ? lines.join("\n") : "✨ Executed cleanly (no print statements).";
+        addXP(10);
+      } catch (e) {
+        out.textContent = "Error: " + e.message;
+      }
+    }
+
+    // QUIZ ENGINE
+    let curQuiz = [];
+    let curQIdx = 0;
+
+    function launchQuiz(id) {
+      curQuiz = QUIZZES[id] || QUIZZES["intro"];
+      curQIdx = 0;
+      document.getElementById("quiz-modal").classList.add("open");
+      renderQuestion();
+    }
+
+    function closeQuiz() {
+      document.getElementById("quiz-modal").classList.remove("open");
+    }
+
+    function renderQuestion() {
+      const q = curQuiz[curQIdx];
+      document.getElementById("quiz-q-num").textContent = `Question ${curQIdx + 1} of ${curQuiz.length}`;
+      document.getElementById("quiz-question-txt").textContent = q.q;
+      const exp = document.getElementById("quiz-expl-box");
+      const next = document.getElementById("quiz-next-btn");
+      exp.style.display = "none";
+      next.style.display = "none";
+
+      const wrap = document.getElementById("quiz-options-wrapper");
+      wrap.innerHTML = q.opts.map((opt, i) => `
+        <button class="q-opt-btn" onclick="checkAns(${i})">${String.fromCharCode(65 + i)}. ${opt}</button>
+      `).join("");
+    }
+
+    function checkAns(idx) {
+      const q = curQuiz[curQIdx];
+      const btns = document.querySelectorAll(".q-opt-btn");
+      btns.forEach(b => b.disabled = true);
+      const isRight = idx === q.a;
+      btns[idx].classList.add(isRight ? "correct" : "wrong");
+      if (!isRight) btns[q.a].classList.add("correct");
+
+      const exp = document.getElementById("quiz-expl-box");
+      exp.style.display = "block";
+      exp.style.color = isRight ? "var(--accent-emerald)" : "var(--accent-rose)";
+      exp.textContent = (isRight ? "Spot on! " : "Incorrect. ") + q.exp;
+
+      if (isRight) {
+        addXP(50);
+        streak++;
+      } else {
+        streak = 0;
+      }
+      localStorage.setItem("pq_strk", streak);
+      updateHUD();
+
+      const next = document.getElementById("quiz-next-btn");
+      next.style.display = "inline-flex";
+      next.textContent = curQIdx >= curQuiz.length - 1 ? "Finish" : "Next →";
+      next.onclick = () => {
+        if (curQIdx >= curQuiz.length - 1) {
+          closeQuiz();
+        } else {
+          curQIdx++;
+          renderQuestion();
+        }
+      };
+    }
+
+    // Startup
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
 </body>
 </html>

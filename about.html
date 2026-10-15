@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About PyQuest - The Vision Behind Visual Python Learning</title>
+  <meta name="description" content="Discover the philosophy, architecture, and mission behind PyQuest — the creative, beginner-first interactive Python learning platform.">
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    /* ==========================================================================
+       DUAL THEME PALETTE: MIDNIGHT BLUE (DARK) & SKY BLUE (LIGHT)
+       ========================================================================== */
+    :root, [data-theme="dark"] {
+      --bg-base: #020817;
+      --bg-surface: #071329;
+      --bg-card: rgba(11, 27, 58, 0.82);
+      --bg-card-hover: rgba(15, 36, 78, 0.95);
+      --bg-code: #010612;
+      --border-subtle: rgba(56, 189, 248, 0.18);
+      --border-active: #38bdf8;
+      --border-card: rgba(56, 189, 248, 0.25);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-faint: #64748b;
+      --accent-cyan: #38bdf8;
+      --accent-sky: #60a5fa;
+      --accent-gold: #fbbf24;
+      --accent-emerald: #34d399;
+      --accent-rose: #f43f5e;
+      --shadow-glow: 0 0 25px rgba(56, 189, 248, 0.35);
+      --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.1);
+      --tag-bg: rgba(56, 189, 248, 0.12);
+      --tag-border: rgba(56, 189, 248, 0.3);
+      --tag-text: #38bdf8;
+      --grad-hero: linear-gradient(135deg, #020817 0%, #0c1c3d 50%, #031433 100%);
+      --grad-primary: linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%);
+    }
+
+    [data-theme="light"] {
+      --bg-base: #f0f9ff;
+      --bg-surface: #e0f2fe;
+      --bg-card: rgba(255, 255, 255, 0.94);
+      --bg-card-hover: #ffffff;
+      --bg-code: #0b192c;
+      --border-subtle: #bae6fd;
+      --border-active: #0284c7;
+      --border-card: #7dd3fc;
+      --text-main: #0c1e3d;
+      --text-muted: #475569;
+      --text-faint: #64748b;
+      --accent-cyan: #0284c7;
+      --accent-sky: #0369a1;
+      --accent-gold: #d97706;
+      --accent-emerald: #059669;
+      --accent-rose: #e11d48;
+      --shadow-glow: 0 0 20px rgba(2, 132, 199, 0.25);
+      --shadow-card: 0 10px 30px rgba(2, 132, 199, 0.12), 0 2px 10px rgba(186, 230, 253, 0.4);
+      --tag-bg: #e0f2fe;
+      --tag-border: #7dd3fc;
+      --tag-text: #0369a1;
+      --grad-hero: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #f0f9ff 100%);
+      --grad-primary: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+
+    a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+    }
+
+    code, .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Header */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--bg-surface);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0.9rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .brand-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--grad-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 1.4rem;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .brand-text h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      background: var(--grad-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.1;
+    }
+
+    .brand-tagline {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+    }
+
+    .nav-links-menu {
+      display: flex;
+      align-items: center;
+      gap: 1.4rem;
+      list-style: none;
+    }
+
+    .nav-links-menu a {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .nav-links-menu a:hover, .nav-links-menu a.active {
+      color: var(--accent-cyan);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .theme-switch-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 0.55rem 1.1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .theme-switch-btn:hover {
+      border-color: var(--accent-cyan);
+    }
+
+    .theme-switch-btn i {
+      color: var(--accent-cyan);
+    }
+
+    /* Hero Section */
+    .about-hero {
+      background: var(--grad-hero);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 4rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--tag-bg);
+      border: 1px solid var(--tag-border);
+      color: var(--tag-text);
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.35rem 0.9rem;
+      border-radius: 50px;
+      margin-bottom: 1.2rem;
+    }
+
+    .about-hero h2 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 1.2rem;
+    }
+
+    .about-hero h2 span {
+      background: var(--grad-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .about-hero p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .hero-btn-row {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-main {
+      background: var(--grad-primary);
+      color: #ffffff;
+      padding: 0.75rem 1.6rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-main:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 0.75rem 1.6rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent-cyan);
+    }
+
+    /* Content Layout */
+    .about-wrapper {
+      max-width: 1200px;
+      margin: 3.5rem auto;
+      padding: 0 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4rem;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .section-title h3 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    /* 4 Pillars Grid */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.8rem;
+    }
+
+    .pillar-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 18px;
+      padding: 2rem 1.6rem;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pillar-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--grad-primary);
+    }
+
+    .pillar-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: var(--tag-bg);
+      border: 1px solid var(--tag-border);
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .pillar-card h4 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 0.8rem;
+    }
+
+    .pillar-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* Comparison Table */
+    .comparison-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .comparison-table th, .comparison-table td {
+      padding: 1.1rem 1.4rem;
+      border-bottom: 1px solid var(--border-subtle);
+      text-align: left;
+    }
+
+    .comparison-table th {
+      background: var(--bg-surface);
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .th-traditional { color: var(--accent-rose); }
+    .th-pyquest { color: var(--accent-cyan); }
+
+    .comparison-table td i.check {
+      color: var(--accent-emerald);
+      margin-right: 0.5rem;
+    }
+
+    /* Tech Stack Cards */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .tech-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 1.4rem;
+      text-align: center;
+    }
+
+    .tech-card i {
+      font-size: 2.2rem;
+      color: var(--accent-cyan);
+      margin-bottom: 0.8rem;
+    }
+
+    .tech-card h5 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .tech-card p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* FAQ Accordion */
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .faq-question {
+      padding: 1.2rem 1.5rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .faq-question:hover {
+      color: var(--accent-cyan);
+    }
+
+    .faq-answer {
+      padding: 0 1.5rem 1.2rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      display: none;
+    }
+
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(180deg);
+    }
+
+    .faq-icon {
+      transition: transform 0.2s ease;
+      color: var(--accent-cyan);
+    }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      padding: 2.5rem 2rem;
+      margin-top: 5rem;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links-menu { display: none; }
+      .about-hero h2 { font-size: 2.1rem; }
+      .comparison-section { padding: 1.5rem; overflow-x: auto; }
+      .site-header { padding: 0.8rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header class="site-header">
+    <div class="brand-wrapper">
+      <div class="brand-icon"><i class="fa-brands fa-python"></i></div>
+      <div class="brand-text">
+        <h1>PyQuest</h1>
+        <div class="brand-tagline">Visual Python Odyssey</div>
+      </div>
+    </div>
+
+    <!-- Navigation Menu Links -->
+    <ul class="nav-links-menu">
+      <li><a href="index.html"><i class="fa-solid fa-graduation-cap"></i> Curriculum</a></li>
+      <li><a href="index.html#playground-anchor"><i class="fa-solid fa-terminal"></i> Code Playground</a></li>
+      <li><a href="#philosophy"><i class="fa-solid fa-compass"></i> Philosophy</a></li>
+      <li><a href="#faq"><i class="fa-solid fa-circle-question"></i> FAQs</a></li>
+      <li><a href="about.html" class="active"><i class="fa-solid fa-info-circle"></i> About</a></li>
+    </ul>
+
+    <!-- Header Actions: Theme Toggle -->
+    <div class="header-actions">
+      <button class="theme-switch-btn" id="theme-btn" title="Toggle Midnight Blue & Sky Blue">
+        <i class="fa-solid fa-moon" id="theme-ico"></i>
+        <span id="theme-txt">Midnight Blue</span>
+      </button>
+      <a href="index.html" class="btn-main" style="padding: 0.5rem 1.1rem; font-size: 0.85rem;">
+        <i class="fa-solid fa-play"></i> Launch App
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="about-hero">
+    <div class="hero-container">
+      <div class="pill-badge">
+        <i class="fa-solid fa-heart" style="color: #f43f5e;"></i>
+        <span>Built for Beginners &bull; Designed from Scratch</span>
+      </div>
+      <h2>Reinventing How Beginners <span>Master Python</span></h2>
+      <p>
+        Most programming tutorials throw walls of static text and confusing syntax at you.
+        PyQuest was created to bridge the intuition gap — transforming abstract coding concepts into
+        interactive, tactile mental models you can see, touch, and play with.
+      </p>
+      <div class="hero-btn-row">
+        <a href="index.html" class="btn-main">
+          <i class="fa-solid fa-rocket"></i> Start Exploring the Tutorials
+        </a>
+        <a href="#philosophy" class="btn-secondary">
+          <i class="fa-solid fa-book-open"></i> Read Our Philosophy
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Container -->
+  <main class="about-wrapper">
+
+    <!-- The 4 Core Pillars -->
+    <section id="philosophy">
+      <div class="section-title">
+        <h3>The 4 Pillars of PyQuest</h3>
+        <p>Why learning Python here feels effortless, intuitive, and unforgettable.</p>
+      </div>
+
+      <div class="pillars-grid">
+        <div class="pillar-card">
+          <div class="pillar-icon"><i class="fa-solid fa-eye"></i></div>
+          <h4>1. Visual Mental Models</h4>
+          <p>
+            You don't just read code; you witness the execution. Slicing becomes a physical knife cutting letter necklaces;
+            variables become labeled sticky tags pointing to memory blocks in the heap.
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon"><i class="fa-solid fa-child-reaching"></i></div>
+          <h4>2. Explain Like I'm 10</h4>
+          <p>
+            Every single topic features an instant toggle between an everyday analogy (blenders, whiteboards, club bouncers)
+            and a technical CPython deep dive (bytecode, pointers, hash maps).
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon"><i class="fa-solid fa-laptop-code"></i></div>
+          <h4>3. Zero-Install Execution</h4>
+          <p>
+            No complex terminal installs or path configurations. Real Python 3 runs straight inside your browser
+            using WebAssembly (Pyodide), with instant fallback execution offline.
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon"><i class="fa-solid fa-trophy"></i></div>
+          <h4>4. Gamified Mastery</h4>
+          <p>
+            Reinforce every module with immediate multiple-choice challenges, XP rewards (+50 XP per right answer),
+            streak counters, and ranks from <em>Syntax Novice</em> up to <em>Python Grandmaster</em>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Traditional Learning vs PyQuest -->
+    <section class="comparison-section">
+      <div class="section-title" style="margin-bottom: 1.5rem;">
+        <h3>How PyQuest Compares</h3>
+        <p>See why students retain 3x more knowledge compared to traditional textbooks.</p>
+      </div>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Learning Feature</th>
+            <th class="th-traditional">Traditional Tutorials</th>
+            <th class="th-pyquest">PyQuest Odyssey</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Memory & Variables</strong></td>
+            <td>Abstract text: "variables store values"</td>
+            <td><i class="fa-solid fa-check check"></i> Visual Stack & Heap RAM pointers with live types</td>
+          </tr>
+          <tr>
+            <td><strong>String Slicing</strong></td>
+            <td>Boring formulas like <code>s[1:5:2]</code></td>
+            <td><i class="fa-solid fa-check check"></i> Interactive knife with positive & negative slider indices</td>
+          </tr>
+          <tr>
+            <td><strong>Loop Execution</strong></td>
+            <td>Static printout lists</td>
+            <td><i class="fa-solid fa-check check"></i> Conveyor belt iterator moving item-by-item</td>
+          </tr>
+          <tr>
+            <td><strong>Environment Setup</strong></td>
+            <td>Install Python, set PATH, install IDE</td>
+            <td><i class="fa-solid fa-check check"></i> 100% In-browser WebAssembly code playground</td>
+          </tr>
+          <tr>
+            <td><strong>Theme Experience</strong></td>
+            <td>Fixed harsh white or generic dark</td>
+            <td><i class="fa-solid fa-check check"></i> Customized Midnight Blue & Sky Blue dynamic themes</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Technology Stack -->
+    <section>
+      <div class="section-title">
+        <h3>Powered By Modern Web Standards</h3>
+        <p>Engineered for lightweight performance, zero dependencies, and instant load times.</p>
+      </div>
+
+      <div class="tech-grid">
+        <div class="tech-card">
+          <i class="fa-brands fa-python"></i>
+          <h5>Python 3 via Pyodide</h5>
+          <p>WebAssembly compilation executing genuine CPython in client memory.</p>
+        </div>
+        <div class="tech-card">
+          <i class="fa-brands fa-html5"></i>
+          <h5>Semantic HTML5</h5>
+          <p>Clean structure, accessible markup, and zero bloated frameworks.</p>
+        </div>
+        <div class="tech-card">
+          <i class="fa-brands fa-css3-alt"></i>
+          <h5>Custom CSS Variables</h5>
+          <p>Instant seamless switching between Midnight Blue and Sky Blue palettes.</p>
+        </div>
+        <div class="tech-card">
+          <i class="fa-brands fa-js"></i>
+          <h5>Vanilla ES6+</h5>
+          <p>60 FPS smooth interactions, local storage persistence, and fast rendering.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Beginner FAQ Section -->
+    <section id="faq">
+      <div class="section-title">
+        <h3>Frequently Asked Questions</h3>
+        <p>Everything you need to know before starting your Python journey.</p>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>Do I need any previous coding experience?</span>
+            <i class="fa-solid fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            Not at all! PyQuest is crafted specifically for complete beginners. Each concept starts with an "Explain Like I'm 10" metaphor so you understand the logic before writing a single line of code.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>Do I need to install Python or VS Code on my PC?</span>
+            <i class="fa-solid fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            Nope! Every code block and playground runs natively in your browser using WebAssembly. You can experiment, tweak numbers, and run scripts with zero software installation required.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>How does the Dark/Light theme toggle work?</span>
+            <i class="fa-solid fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            We designed two tailor-made color palettes: a deep <strong>Midnight Blue</strong> for late-night focus and a radiant <strong>Sky Blue</strong> for bright daylight study. Your preference is automatically saved in your browser's local storage.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>Are all essential Python topics included?</span>
+            <i class="fa-solid fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            Yes! All 16 foundational chapters are covered: from basic print statements, data types, operators, and slicing, to functions, comprehensions, file I/O, error handling, Object-Oriented Programming (OOP), and hands-on arcade mini-projects.
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <div class="brand-wrapper">
+          <div class="brand-icon"><i class="fa-brands fa-python"></i></div>
+          <div class="brand-text">
+            <h3>PyQuest</h3>
+            <p style="color:var(--text-muted); font-size:0.85rem;">Empowering beginners through visual intuition and hands-on coding.</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer-links">
+        <p style="color:var(--text-muted); font-size:0.85rem;">
+          Themes: <strong>Midnight Blue</strong> &bull; <strong>Sky Blue</strong> | 
+          <a href="index.html" style="font-weight:700;">Go to Curriculum &rarr;</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Theme Synchronization Script & FAQ Accordion -->
+  <script>
+    // Theme Management synced with PyQuest
+    function initTheme() {
+      const saved = localStorage.getItem("pyquest-theme") || localStorage.getItem("pq_theme") || "dark";
+      setTheme(saved);
+
+      const btn = document.getElementById("theme-btn");
+      if (btn) {
+        btn.addEventListener("click", () => {
+          const current = document.documentElement.getAttribute("data-theme") || "dark";
+          const next = current === "dark" ? "light" : "dark";
+          setTheme(next);
+        });
+      }
+    }
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      localStorage.setItem("pyquest-theme", theme);
+      localStorage.setItem("pq_theme", theme);
+
+      const ico = document.getElementById("theme-ico");
+      const txt = document.getElementById("theme-txt");
+      if (ico && txt) {
+        if (theme === "dark") {
+          ico.className = "fa-solid fa-moon";
+          txt.textContent = "Midnight Blue";
+        } else {
+          ico.className = "fa-solid fa-sun";
+          txt.textContent = "Sky Blue";
+        }
+      }
+    }
+
+    // FAQ Accordion Toggle
+    document.querySelectorAll(".faq-item").forEach(item => {
+      const q = item.querySelector(".faq-question");
+      q.addEventListener("click", () => {
+        const isOpen = item.classList.contains("open");
+        document.querySelectorAll(".faq-item").forEach(i => i.classList.remove("open"));
+        if (!isOpen) item.classList.add("open");
+      });
+    });
+
+    document.addEventListener("DOMContentLoaded", initTheme);
+  </script>
+</body>
+</html>
